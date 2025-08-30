@@ -9,22 +9,22 @@ import altair as alt
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.impute import KNNImputer
-from missingpy import MissForest
+#from missingpy import MissForest
 
 # 图像中文显示的问题
 matplotlib.rcParams['axes.unicode_minus'] = False  
 sns.set_theme(font='Kaiti', style='ticks', font_scale=1.4)
 
 # 读取用于演示的数据集
-oceandf = pd.read_csv("02/data/热带大气海洋数据.csv")
+oceandf = pd.read_csv("02_数据探索与可视化/data/热带大气海洋数据.csv")
 
 # 2.1.1 简单的缺失值处理方法
 '''(1) 发现数据中的缺失值
 #### 判断每个变量中是否存在缺失值
 pd.isna(oceandf).sum()
 #### 使用可视化方法查看缺失值在数据中的分布
-#msno.matrix(oceandf, figsize=(14, 7), width_ratios=(13, 2), color=(0.25, 0.25, 0.5))
-#plt.show()
+msno.matrix(oceandf, figsize=(14, 7), width_ratios=(13, 2), color=(0.25, 0.25, 0.5))
+plt.show()
 '''
 '''(2) 剔除带有缺失值的行或列
 #### 删除带有缺失值的行
