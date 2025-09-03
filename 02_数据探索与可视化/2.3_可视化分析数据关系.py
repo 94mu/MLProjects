@@ -10,6 +10,8 @@ from pandas.plotting import parallel_coordinates
 from wordcloud import WordCloud
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
+from vega_datasets import data
+import numpy as np
 
 # 处理matplotlib中文显示问题
 matplotlib.rcParams['axes.unicode_minus'] = False  
@@ -91,7 +93,7 @@ fig.write_html("02_数据探索与可视化/data/2.3_可视化分析数据关系
 
 # 2.3.3 连续变量与分类变量间关系可视化
 Irislong = Iris.melt(["Id", "Species"], var_name="Measurement_type", value_name="Value")
-## 一个连续变量与一个分类变量
+## （1）一个连续变量与一个分类变量
 '''分组箱线图
 plt.figure(figsize=(10, 6))
 sns.boxplot(data=Irislong, x='Species', y='Value', palette='Set3')
@@ -120,7 +122,7 @@ chart = alt.Chart(Irislong).transform_density(
         ).properties(width=500, height=80, title='分面密度图')
 chart.save('02_数据探索与可视化/data/2.3_可视化分析数据关系分面密度图_2.html')
 '''
-## 两个分类变量的一个连续变量
+## （2）两个分类变量的一个连续变量
 '''分组箱线图
 plt.figure(figsize=(10,6))
 sns.boxplot(data=Irislong, x='Measurement_type', y='Value', hue='Species')
@@ -128,13 +130,13 @@ plt.legend(loc=1)
 plt.title('分组箱线图')
 plt.show()
 '''
-## 两个分类变量和两个连续变量
+## （3）两个分类变量和两个连续变量
 '''分面散点图
 g = sns.FacetGrid(data = Titanic, row="Survived", col="Sex", margin_titles=True, height=3, aspect=1.4)
 g.map(sns.scatterplot,"Age" ,"Fare",)
 plt.show()
 '''
-## 一个分类变量和多个连续变量
+## （4）一个分类变量和多个连续变量
 '''平行坐标图
 plt.figure(figsize=(10,6))
 parallel_coordinates(Iris.iloc[:,1:6], "Species",alpha = 0.8)
@@ -220,4 +222,27 @@ nx.draw_networkx_labels(G,pos,font_size = 14)
 plt.axis('off')
 plt.title("空手道俱乐部人物关系")
 plt.show() 
+'''
+'''地图数据
+states = alt.topo_feature(data.us_10m.url, feature='states')
+## 机场位置和数量数据
+airports = pd.read_csv("02_数据探索与可视化/data/airports.csv")
+airports = airports.groupby("state").agg(latitude = ("latitude","mean"),
+                                         longitude = ("longitude","mean"),
+                                         number = ("state",np.size))
+airports["state2"] = airports.index.values
+## 气泡地图
+## 美国地图背景
+background = alt.Chart(states).mark_geoshape(fill="lightblue",stroke="white"
+            ).properties(width=500,height=300).project("albersUsa")
+## 机场的位置和气泡
+points = alt.Chart(airports).mark_circle().encode(
+                    longitude="longitude:Q",
+                    latitude="latitude:Q",
+                    size=alt.Size("number:Q", title="机场数量"),
+                    color=alt.value("red"),
+                    tooltip=["state2:N","number:Q"]
+                  ).properties(title="美国机场数量")
+## 可视化背景和点
+(background + points).save('02_数据探索与可视化/data/2.3_可视化分析数据机场气泡图.html')
 '''
